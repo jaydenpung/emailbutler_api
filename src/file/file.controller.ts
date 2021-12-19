@@ -5,12 +5,12 @@ import {
     UseInterceptors,
     UploadedFile,
     Body,
+    Delete,
 } from '@nestjs/common';
 
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels, getSchemaPath, ApiConsumes, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileService } from './file.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Permissions } from '../permissions.decorator';
 import { PermissionsGuard } from '../permissions.guard';
 import { Express } from 'express'
 import { FileInterceptor } from '@nestjs/platform-express/multer';
@@ -45,7 +45,7 @@ export class FileController {
         return await this.service.uploadFile(file, createFileDTO);
     }
 
-    @Post('delete')
+    @Delete('')
     @ApiOperation({ summary: 'Delete file' })
     @ApiBody({
         schema: {
