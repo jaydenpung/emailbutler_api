@@ -1,6 +1,6 @@
 # emailbutler_api  
-[![Deploy master branch](https://github.com/jaydenpung/v1_healthbay_api/actions/workflows/deploy.yml/badge.svg)](https://github.com/jaydenpung/v1_healthbay_api/actions/workflows/deploy.yml)  
-Api repository for healthbay. Steps below are for references only.
+[![Deploy master branch](https://github.com/jaydenpung/emailbutler_api/actions/workflows/deploy.yml/badge.svg)](https://github.com/jaydenpung/emailbutler_api/actions/workflows/deploy.yml)  
+Api repository for emailbutler api. Steps below are for references only.
 
 ## Setup
 - Rename **.env.tmp** in root folder to **.env**

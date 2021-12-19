@@ -1,5 +1,5 @@
 service:
- name: healthbay-api-lambda-sandbox
+ name: emailbutler-api-lambda-prod
 
 plugins:
  - 'serverless-plugin-typescript'
