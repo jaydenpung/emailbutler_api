@@ -44,12 +44,23 @@ export class UserController {
     }
 
     @Get('me')
-    @ApiOperation({ summary: 'Get user profile' })
+    @ApiOperation({ summary: 'Get user profile from token' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('read:user')
-    async find(@Req() request) {
+    async me(@Req() request) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+
+        return userDetail;
+    }
+
+    @Post('realme')
+    @ApiOperation({ summary: 'Get user profile via api call' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:user')
+    async realme(@Req() request) {
         const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
         const user = await this.service.findOne(userDetail);
+        await this.service.update(user);
 
         return user;
     }

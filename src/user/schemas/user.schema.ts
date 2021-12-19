@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsString } from 'class-validator';
+import { IsDate, IsEmail, IsString } from 'class-validator';
 import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
@@ -8,14 +8,19 @@ export type UserDocument = User & Document;
 @Schema()
 export class User extends Document {
     @ApiProperty()
-    @Prop()
-    @IsString()
-    name: string;
+    @Prop({ unique: true })
+    @IsEmail()
+    email: string;
 
     @ApiProperty()
     @Prop()
     @IsString()
-    address: string;
+    authId: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    refreshToken: string;
 
     @ApiProperty()
     @Prop({ default: Date.now() })

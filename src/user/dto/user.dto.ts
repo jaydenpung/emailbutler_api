@@ -9,11 +9,15 @@ export class UserDTO {
 
     @ApiProperty()
     @IsString()
-    name: string;
+    email: string;
 
     @ApiProperty()
     @IsString()
-    address: string;
+    authId: string;
+
+    @ApiProperty()
+    @IsString()
+    refreshToken: string;
 
     @ApiProperty()
     @IsDate()
@@ -26,8 +30,9 @@ export class UserDTO {
     static mutation(user: User): UserDTO {
         const dto = new UserDTO();
         dto.id = user.id,
-        dto.name = user.name,
-        dto.address = user.address,
+        dto.email = user.email,
+        dto.refreshToken = user.refreshToken,
+        dto.authId = user.authId,
         dto.createdAt = user.createdAt,
         dto.updatedAt = user.updatedAt
         return dto;

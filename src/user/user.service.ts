@@ -76,6 +76,16 @@ export class UserService {
         return userData;
     }
 
+    async update(auth0UserData: any): Promise<any> {
+        const user = await this.model.updateOne(
+            { authId: auth0UserData.user_id, deletedAt: null },
+            { email: auth0UserData.email, authId: auth0UserData.user_id, refreshToken: auth0UserData.identities[0].refresh_token, updatedAt: new Date() },
+            { upsert: true }
+        );
+
+        return user;
+    }
+
     getManagementAccessToken() {
         const auth0 = new AuthenticationClient({
             domain: `${process.env.AUTH0_ACCOUNT}.auth0.com`,
