@@ -1,0 +1,24 @@
+service:
+ name: healthbay-api-lambda-sandbox
+
+plugins:
+ - 'serverless-plugin-typescript'
+ - serverless-plugin-optimize
+ - serverless-offline
+
+provider:
+ name: aws
+ region: ap-southeast-1
+ runtime: nodejs12.x
+ apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+
+functions:
+ main: # The name of the lambda function
+   # The module 'handler' is exported in the file 'src/lambda'
+   handler: src/lambda.handler
+   events:
+     - http:
+         method: any
+         path: /{any+}
