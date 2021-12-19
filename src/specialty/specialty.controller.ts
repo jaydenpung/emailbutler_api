@@ -34,7 +34,7 @@ export class SpecialtyController {
     @Get()
     @ApiOperation({ summary: 'Read many specialtys' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('list:specialty')
+    //@Permissions('list:specialty')
     async index(@Query() queryParameters: SpecialtyQueryParameterDTO) {
         const queryFilter = new SpecialtyQueryParameter(queryParameters);
         
@@ -49,7 +49,7 @@ export class SpecialtyController {
     @Get(':id')
     @ApiOperation({ summary: 'Read single specialty' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('read:specialty')
+    //@Permissions('read:specialty')
     async find(@Param() { id }: IdParameterDTO) {
         const specialty = await this.service.findOne(id);
 
@@ -59,7 +59,7 @@ export class SpecialtyController {
     @Post()
     @ApiOperation({ summary: 'Create specialty' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('create:specialty')
+    //@Permissions('create:specialty')
     async create(@Body() createSpecialtyDto: CreateSpecialtyDTO) {
         const specialty = await this.service.create(createSpecialtyDto);
 
@@ -69,7 +69,7 @@ export class SpecialtyController {
     @Patch(':id')
     @ApiOperation({ summary: 'Update specialty' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('update:specialty')
+    //@Permissions('update:specialty')
     async update(@Param() { id }: IdParameterDTO, @Body() updateSpecialtyDTO: UpdateSpecialtyDTO) {
         const specialty = await this.service.update(id, updateSpecialtyDTO);
 
@@ -79,7 +79,7 @@ export class SpecialtyController {
     @Delete(':id')
     @ApiOperation({ summary: 'Delete specialty' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('delete:specialty')
+    //@Permissions('delete:specialty')
     async delete(@Param() { id }: IdParameterDTO) {
         const specialty = await this.service.delete(id);
 
