@@ -40,7 +40,7 @@ export class FileController {
         }
     })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('create:file')
+    //@Permissions('create:file')
     async uploadFile(@UploadedFile() file: Express.Multer.File, @Body() createFileDTO: CreateFileDTO) {
         return await this.service.uploadFile(file, createFileDTO);
     }
@@ -56,7 +56,7 @@ export class FileController {
         }
     })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('delete:file')
+    //@Permissions('delete:file')
     async deleteFile(@Body() deleteFileDTO: DeleteFileDTO) {
         return await this.service.deleteFile(deleteFileDTO);
     }

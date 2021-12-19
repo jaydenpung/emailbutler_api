@@ -31,7 +31,7 @@ export class UserController {
     @Get()
     @ApiOperation({ summary: 'Read many users' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('list:user')
+    //@Permissions('list:user')
     async index(@Query() queryParameters: UserQueryParameterDTO) {
         const queryFilter = new UserQueryParameter(queryParameters);
 
@@ -46,7 +46,7 @@ export class UserController {
     @Get('me')
     @ApiOperation({ summary: 'Get user profile' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    @Permissions('read:user')
+    //@Permissions('read:user')
     async find(@Req() request) {
         const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
         const user = await this.service.findOne(userDetail);
