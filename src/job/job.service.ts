@@ -10,6 +10,8 @@ import { NotFoundException } from '../common/exception/not-found.exception';
 import { google } from 'googleapis';
 import { JobResultDTO } from './dto/job-result.dto';
 import { FileDTO } from './dto/file.dto';
+import { JobPreviewDTO } from './dto/job-preview.dto';
+import { EmailDTO } from './dto/email.dto';
 
 @Injectable()
 export class JobService {
@@ -184,5 +186,73 @@ export class JobService {
         job.jobResults = job.jobResults.concat(jobResults);
 
         return job.save();
+    }
+
+    async preview(userDetail: any, id: Types.ObjectId): Promise<JobPreviewDTO> {
+        const job = await this.model.findOne({ _id: id, authUserId: userDetail.user_id, deletedAt: null});
+
+        if (!job) {
+            throw new NotFoundException();
+        }
+
+        const jobPreview = new JobPreviewDTO();
+        jobPreview.emails = [];
+
+        //intialize auth client
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOG_CLIENT_ID,
+            process.env.GOOG_CLIENT_SECRET,
+            process.env.GOOG_REDIRECT_URI
+        );
+        oauth2Client.setCredentials({ refresh_token: userDetail.identities[0].refresh_token });
+        const defaultConfig = {
+            auth: oauth2Client,
+            userId: 'me'
+        }
+
+        //run job
+        const gmail = google.gmail('v1').users.messages;
+        const searchResults = await gmail.list({
+            ...defaultConfig,
+            q: job.mailQuery
+        })
+
+        if (searchResults.data.resultSizeEstimate === 0) {
+            return jobPreview;
+        }
+
+        const searchedMails = searchResults.data.messages;
+        // go through each mail
+        for (const searchedMail of searchedMails) {
+
+            const emailDTO = new EmailDTO();
+
+            const mail = await gmail.get({
+                ...defaultConfig,
+                id: searchedMail.id
+            });
+
+            emailDTO.snippet = mail.data.snippet;
+
+            //look for subject and date
+            for (const header of mail.data.payload.headers) {
+                if (header.name === 'Subject') {
+                    emailDTO.subject = header.value;
+                }
+                else if (header.name == 'Date') {
+                    emailDTO.date = new Date(header.value);
+                }
+            }
+
+            //look for attachments
+            for (const part of mail.data.payload.parts) {
+                if (part.filename !== '') {
+                    emailDTO.hasAttachment = true;
+                }
+            }
+            jobPreview.emails.push(emailDTO);
+        }
+
+        return jobPreview;
     }
 }

@@ -23,6 +23,7 @@ import { JobQueryParameterDTO } from './dto/job-query-parameter.dto';
 import { JobDTO } from './dto/job.dto';
 import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
+import { JobPreviewDTO } from './dto/job-preview.dto';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -112,5 +113,16 @@ export class JobController {
         const job = await this.service.run(userDetail, id);
 
         return JobDTO.mutation(job);
+    }
+
+    @Post('preview/:id')
+    @ApiOperation({ summary: 'Run job preview - get email subjects only' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('delete:job')
+    async preview(@Req() request, @Param() { id }: IdParameterDTO) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const jobPreview = await this.service.preview(userDetail, id);
+
+        return JobPreviewDTO.mutation(jobPreview);
     }
 }
