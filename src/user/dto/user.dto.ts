@@ -13,7 +13,7 @@ export class UserDTO {
 
     @ApiProperty()
     @IsString()
-    authId: string;
+    authUserId: string;
 
     @ApiProperty()
     @IsString()
@@ -32,7 +32,7 @@ export class UserDTO {
         dto.id = user.id,
         dto.email = user.email,
         dto.refreshToken = user.refreshToken,
-        dto.authId = user.authId,
+        dto.authUserId = user.authUserId,
         dto.createdAt = user.createdAt,
         dto.updatedAt = user.updatedAt
         return dto;

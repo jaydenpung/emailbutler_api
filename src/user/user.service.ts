@@ -78,8 +78,8 @@ export class UserService {
 
     async update(auth0UserData: any): Promise<any> {
         const user = await this.model.updateOne(
-            { authId: auth0UserData.user_id, deletedAt: null },
-            { email: auth0UserData.email, authId: auth0UserData.user_id, refreshToken: auth0UserData.identities[0].refresh_token, updatedAt: new Date() },
+            { authUserId: auth0UserData.user_id, deletedAt: null },
+            { email: auth0UserData.email, authUserId: auth0UserData.user_id, refreshToken: auth0UserData.identities[0].refresh_token, updatedAt: new Date() },
             { upsert: true }
         );
 
