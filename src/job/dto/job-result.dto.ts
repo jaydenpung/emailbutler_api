@@ -26,4 +26,29 @@ export class JobResultDTO {
     @IsDate()
     @IsOptional()
     deletedAt: Date;
+
+    static mutation(data: any): any {
+        if (!data) {
+            return false;
+        }
+
+        if (Array.isArray(data)) {
+            return data.map(child => {
+                return this.mutation2(child);
+            }) as JobResultDTO[]
+        }
+
+        return this.mutation2(data) as JobResultDTO;
+    }
+
+    static mutation2(medicalCondition: JobResultDTO): JobResultDTO {
+        const dto = new JobResultDTO();
+        dto.fileName = medicalCondition.fileName || null;
+        dto.storagePath = medicalCondition.storagePath || null;
+        dto.createdAt = medicalCondition.createdAt || null;
+        dto.updatedAt = medicalCondition.updatedAt || null;
+        dto.deletedAt = medicalCondition.deletedAt || null;
+
+        return dto;
+    }
 }

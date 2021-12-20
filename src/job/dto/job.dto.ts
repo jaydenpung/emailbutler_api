@@ -65,17 +65,17 @@ export class JobDTO {
 
     static mutation(job: Job): JobDTO {
         const dto = new JobDTO();
-        dto.id = job.id,
-        dto.authUserId = job.authUserId,
-        dto.name = job.name,
-        dto.storagePath = job.storagePath,
-        dto.mailQuery = job.mailQuery,
-        dto.recurring = job.recurring,
-        dto.jobResults = job.jobResults;
-        dto.lastRunAt = job.lastRunAt;
-        dto.createdAt = job.createdAt;
-        dto.updatedAt = job.updatedAt;
-        dto.deletedAt = job.deletedAt;
+        dto.id = job.id || null,
+        dto.authUserId = job.authUserId || null,
+        dto.name = job.name || null,
+        dto.storagePath = job.storagePath || null,
+        dto.mailQuery = job.mailQuery || null,
+        dto.recurring = job.recurring || null,
+        dto.jobResults = JobResultDTO.mutation(job.jobResults) || [];
+        dto.lastRunAt = job.lastRunAt || null;
+        dto.createdAt = job.createdAt || null;
+        dto.updatedAt = job.updatedAt || null;
+        dto.deletedAt = job.deletedAt || null;
         return dto;
     }
 }
