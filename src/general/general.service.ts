@@ -9,7 +9,7 @@ export class GeneralService {
     constructor(@InjectModel(General.name) private readonly model: Model<GeneralDocument>) { }
 
     async getLoginUrl(): Promise<LoginDTO> {
-        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&connection_scope=https://www.googleapis.com/auth/gmail.readonly&access_type=offlin&redirect_uri=${process.env.AUTH0_REDIRECT}`;
+        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&connection_scope=https://www.googleapis.com/auth/gmail.readonly&access_type=offline&redirect_uri=${process.env.AUTH0_REDIRECT}`;
         const login = new LoginDTO();
         login.url = result;
 
