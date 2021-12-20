@@ -56,11 +56,11 @@ export class JobService {
             throw new NotFoundException();
         }
 
-        job.name = updateJobDTO.name;
-        job.storagePath = updateJobDTO.storagePath;
-        job.mailQuery = updateJobDTO.mailQuery;
-        job.recurring = updateJobDTO.recurring;
-        job.jobResults = updateJobDTO.jobResults;
+        job.name = updateJobDTO.name || job.name;
+        job.storagePath = updateJobDTO.storagePath || job.storagePath;
+        job.mailQuery = updateJobDTO.mailQuery || job.mailQuery;
+        job.recurring = updateJobDTO.recurring || job.recurring;
+        job.jobResults = updateJobDTO.jobResults || job.jobResults;
 
         job.updatedAt = new Date();
         return job.save();
