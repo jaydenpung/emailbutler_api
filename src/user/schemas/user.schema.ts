@@ -7,15 +7,16 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User extends Document {
-    @ApiProperty()
-    @Prop({ unique: true })
-    @IsEmail()
-    email: string;
 
     @ApiProperty()
-    @Prop()
+    @Prop({ unique: true })
     @IsString()
-    authId: string;
+    authUserId: string;
+    
+    @ApiProperty()
+    @Prop()
+    @IsEmail()
+    email: string;
 
     @ApiProperty()
     @Prop()

@@ -10,6 +10,7 @@ import { GeneralModule } from './general/general.module';
 import { FileModule } from './file/file.module';
 import { UserModule } from './user/user.module';
 import { UniqueConstraint } from './common/validator/unique.validator';
+import { JobModule } from './job/job.module';
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { UniqueConstraint } from './common/validator/unique.validator';
         SpecialtyModule,
         GeneralModule,
         FileModule,
+        JobModule,
         UserModule
     ],
     controllers: [AppController],
