@@ -1,31 +1,32 @@
+import { Prop } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsDate, IsOptional } from "class-validator";
+import { Type } from "class-transformer";
+import { IsDate, IsOptional, IsArray, ValidateNested, IsString } from "class-validator";
+import { FileDTO as FileDTO } from "./file.dto";
 
 export class JobResultDTO {
-    @ApiProperty()
-    @IsString()
-    @IsOptional()
-    fileName: string;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
-    storagePath: string;
+    emailTitle: string;
+
+    @ApiProperty()
+    @IsDate()
+    @IsOptional()
+    emailDate: Date;
+
+    @Prop({ type: [FileDTO] })
+    @IsArray()
+    @IsOptional()
+    @Type(() => FileDTO )
+    @ValidateNested({ each: true })
+    files: FileDTO[];
 
     @ApiProperty()
     @IsDate()
     @IsOptional()
     createdAt: Date;
-
-    @ApiProperty()
-    @IsDate()
-    @IsOptional()
-    updatedAt: Date;
-
-    @ApiProperty()
-    @IsDate()
-    @IsOptional()
-    deletedAt: Date;
 
     static mutation(data: any): any {
         if (!data) {
@@ -41,13 +42,12 @@ export class JobResultDTO {
         return this.mutation2(data) as JobResultDTO;
     }
 
-    static mutation2(medicalCondition: JobResultDTO): JobResultDTO {
+    static mutation2(jobResultDTO: JobResultDTO): JobResultDTO {
         const dto = new JobResultDTO();
-        dto.fileName = medicalCondition.fileName || null;
-        dto.storagePath = medicalCondition.storagePath || null;
-        dto.createdAt = medicalCondition.createdAt || null;
-        dto.updatedAt = medicalCondition.updatedAt || null;
-        dto.deletedAt = medicalCondition.deletedAt || null;
+        dto.emailTitle = jobResultDTO.emailTitle || null;
+        dto.emailDate = jobResultDTO.emailDate || null;
+        dto.files = FileDTO.mutation(jobResultDTO.files) || [];
+        dto.createdAt = jobResultDTO.createdAt || new Date();
 
         return dto;
     }

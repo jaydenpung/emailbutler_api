@@ -103,4 +103,15 @@ export class JobController {
 
         return JobDTO.mutation(job);
     }
+
+    @Post('run/:id')
+    @ApiOperation({ summary: 'Run job' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('delete:job')
+    async run(@Req() request, @Param() { id }: IdParameterDTO) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const job = await this.service.run(userDetail, id);
+
+        return JobDTO.mutation(job);
+    }
 }
