@@ -1,6 +1,6 @@
-import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsString, IsBoolean, IsObject } from 'class-validator';
+import { IsDate, IsString, IsBoolean } from 'class-validator';
 import { Document } from 'mongoose';
 import { JobResultDTO } from '../dto/job-result.dto';
 

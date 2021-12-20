@@ -3,14 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateJobDTO } from './dto/create-job.dto';
 import { UpdateJobDTO } from './dto/update-job.dto';
-import { Job, JobDocument, JobSchema } from './schemas/job.schema';
+import { Job, JobDocument } from './schemas/job.schema';
 import { JobQueryParameter } from './query-parameter/job-query-parameter';
 import { Pagination } from '../common/pagination/pagination';
 import { NotFoundException } from '../common/exception/not-found.exception';
 import { google } from 'googleapis';
 import { JobResultDTO } from './dto/job-result.dto';
 import { FileDTO } from './dto/file.dto';
-import { JobDTO } from './dto/job.dto';
 
 @Injectable()
 export class JobService {

@@ -23,7 +23,6 @@ import { JobQueryParameterDTO } from './dto/job-query-parameter.dto';
 import { JobDTO } from './dto/job.dto';
 import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
-import { request } from 'http';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
