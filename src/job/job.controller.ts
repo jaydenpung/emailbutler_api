@@ -7,7 +7,8 @@ import {
     Post,
     Patch,
     Query,
-    UseGuards
+    UseGuards,
+    Req
 } from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels } from '@nestjs/swagger';
@@ -22,6 +23,7 @@ import { JobQueryParameterDTO } from './dto/job-query-parameter.dto';
 import { JobDTO } from './dto/job.dto';
 import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
+import { request } from 'http';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -45,6 +47,22 @@ export class JobController {
         return (result as Job[]).map<JobDTO>(JobDTO.mutation);
     }
 
+    @Get('me')
+    @ApiOperation({ summary: 'Read many jobs' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('list:job')
+    async listOwnJob(@Req() request, @Query() queryParameters: JobQueryParameterDTO) {
+        const queryFilter = new JobQueryParameter(queryParameters);
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        
+        const result = await this.service.findOwnAll(userDetail.user_id, queryFilter);
+        if (queryFilter.hasPaginationMeta()) {
+            return result as Pagination;
+        }
+
+        return (result as Job[]).map<JobDTO>(JobDTO.mutation);
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Read single job' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
@@ -59,8 +77,9 @@ export class JobController {
     @ApiOperation({ summary: 'Create job' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('create:job')
-    async create(@Body() createJobDto: CreateJobDTO) {
-        const job = await this.service.create(createJobDto);
+    async create(@Req() request, @Body() createJobDto: CreateJobDTO) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const job = await this.service.create(userDetail.user_id, createJobDto);
 
         return JobDTO.mutation(job);
     }

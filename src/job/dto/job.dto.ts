@@ -6,6 +6,11 @@ import { JobResultDTO } from "./job-result.dto";
 import { Type } from "class-transformer";
 
 export class JobDTO {
+
+    @ApiProperty()
+    @IsString()
+    id: string;
+
     @ApiProperty()
     @Prop()
     @IsString()
@@ -60,6 +65,7 @@ export class JobDTO {
 
     static mutation(job: Job): JobDTO {
         const dto = new JobDTO();
+        dto.id = job.id,
         dto.authUserId = job.authUserId,
         dto.name = job.name,
         dto.storagePath = job.storagePath,

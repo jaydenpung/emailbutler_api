@@ -10,7 +10,7 @@ export type JobDocument = Job & Document;
 export class Job extends Document {
 
     @ApiProperty()
-    @Prop()
+    @Prop({ index: true })
     @IsString()
     authUserId: string;
 

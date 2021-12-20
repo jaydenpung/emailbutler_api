@@ -22,6 +22,14 @@ export class JobService {
         return queryFilter.setMongooseQuery(this.model, { deletedAt: null });
     }
 
+    async findOwnAll(authUserId: string, queryFilter: JobQueryParameter): Promise<Job[] | Pagination> {
+        if (queryFilter.hasPaginationMeta()) {
+            return queryFilter.getPagination(this.model, { deletedAt: null, authUserId: authUserId });
+        }
+
+        return queryFilter.setMongooseQuery(this.model, { deletedAt: null, authUserId: authUserId });
+    }
+
     async findOne(id: Types.ObjectId): Promise<Job> {
         const job = await this.model.findOne({ _id: id, deletedAt: null});
 
@@ -32,9 +40,10 @@ export class JobService {
         return job;
     }
 
-    async create(createJobDto: CreateJobDTO): Promise<Job> {
+    async create(authUserId: string, createJobDto: CreateJobDTO): Promise<Job> {
         return this.model.create({
             ...createJobDto,
+            authUserId: authUserId,
             createdAt: new Date(),
             updatedAt: new Date()
         })
