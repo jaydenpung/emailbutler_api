@@ -12,7 +12,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels, ApiOkResponse, ge
 import { GeneralService } from './general.service';
 import { IdParameterDTO } from '../../src/common/dto/id-parameter.dto';
 import { Pagination } from '../../src/common/pagination/pagination';
-import { LoginRequestDTO } from './dto/login-request.dto';
+import { LoginRequestDTO } from './dto/loginout-request.dto';
 
 @ApiBearerAuth()
 @ApiTags('General')
@@ -26,5 +26,11 @@ export class GeneralController {
     @ApiOperation({ summary: 'Login' })
     async getLoginUrl(@Body() loginRequest: LoginRequestDTO) {
         return await this.service.getLoginUrl(loginRequest);
+    }
+
+    @Post('logout')
+    @ApiOperation({ summary: 'Logout' })
+    async getLogoutUrl(@Body() loginRequest: LoginRequestDTO) {
+        return await this.service.getLogoutUrl(loginRequest);
     }
 }
