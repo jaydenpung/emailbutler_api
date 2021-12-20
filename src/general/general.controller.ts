@@ -1,4 +1,5 @@
 import {
+    Body,
     Controller,
     Get,
     Param,
@@ -11,6 +12,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels, ApiOkResponse, ge
 import { GeneralService } from './general.service';
 import { IdParameterDTO } from '../../src/common/dto/id-parameter.dto';
 import { Pagination } from '../../src/common/pagination/pagination';
+import { LoginRequestDTO } from './dto/login-request.dto';
 
 @ApiBearerAuth()
 @ApiTags('General')
@@ -22,7 +24,7 @@ export class GeneralController {
 
     @Post('login')
     @ApiOperation({ summary: 'Login' })
-    async getLoginUrl() {
-        return await this.service.getLoginUrl();
+    async getLoginUrl(@Body() loginRequest: LoginRequestDTO) {
+        return await this.service.getLoginUrl(loginRequest);
     }
 }
