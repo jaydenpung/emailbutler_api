@@ -1,5 +1,5 @@
 service:
- name: emailbutler-api-lambda-prod
+ name: emailbutler-api-lambda-staging
 
 plugins:
  - 'serverless-plugin-typescript'
