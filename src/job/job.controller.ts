@@ -25,6 +25,7 @@ import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
 import { JobPreviewDTO } from './dto/job-preview.dto';
 import { RunJobDTO } from './dto/run-job.dto';
+import { TokenUserDTO } from 'src/common/dto/token-user.dto';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -33,84 +34,12 @@ import { RunJobDTO } from './dto/run-job.dto';
 export class JobController {
     constructor(private readonly service: JobService) { }
 
-    @Get()
-    @ApiOperation({ summary: 'Read many jobs' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('list:job')
-    async index(@Query() queryParameters: JobQueryParameterDTO) {
-        const queryFilter = new JobQueryParameter(queryParameters);
-        
-        const result = await this.service.findAll(queryFilter);
-        if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
-        }
-
-        return (result as Job[]).map<JobDTO>(JobDTO.mutation);
-    }
-
-    @Get('me')
-    @ApiOperation({ summary: 'Read many jobs' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('list:job')
-    async listOwnJob(@Req() request, @Query() queryParameters: JobQueryParameterDTO) {
-        const queryFilter = new JobQueryParameter(queryParameters);
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        
-        const result = await this.service.findOwnAll(userDetail.userId, queryFilter);
-        if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
-        }
-
-        return (result as Job[]).map<JobDTO>(JobDTO.mutation);
-    }
-
-    @Get(':id')
-    @ApiOperation({ summary: 'Read single job' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('read:job')
-    async find(@Param() { id }: IdParameterDTO) {
-        const job = await this.service.findOne(id);
-
-        return JobDTO.mutation(job);
-    }
-
-    @Post()
-    @ApiOperation({ summary: 'Create job' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('create:job')
-    async create(@Req() request, @Body() createJobDto: CreateJobDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        const job = await this.service.create(userDetail.userId, createJobDto);
-
-        return JobDTO.mutation(job);
-    }
-
-    @Patch(':id')
-    @ApiOperation({ summary: 'Update job' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('update:job')
-    async update(@Param() { id }: IdParameterDTO, @Body() updateJobDTO: UpdateJobDTO) {
-        const job = await this.service.update(id, updateJobDTO);
-
-        return JobDTO.mutation(job);
-    }
-
-    @Delete(':id')
-    @ApiOperation({ summary: 'Delete job' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('delete:job')
-    async delete(@Param() { id }: IdParameterDTO) {
-        const job = await this.service.delete(id);
-
-        return JobDTO.mutation(job);
-    }
-
     @Post('run/:id')
     @ApiOperation({ summary: 'Run job' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async run(@Req() request, @Param() { id }: IdParameterDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
         const job = await this.service.run(userDetail, id);
 
         return JobDTO.mutation(job);
@@ -121,7 +50,7 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async runSingle(@Req() request, @Body() runJobDTO: RunJobDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
         const job = await this.service.runSingle(userDetail, runJobDTO);
 
         return job;
@@ -132,9 +61,70 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async preview(@Req() request, @Param() { id }: IdParameterDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
         const jobPreview = await this.service.preview(userDetail, id);
 
         return JobPreviewDTO.mutation(jobPreview);
+    }
+
+    /*** CRUD ***/
+    @Get()
+    @ApiOperation({ summary: 'Read many jobs' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('list:job')
+    async index(@Req() request, @Query() queryParameters: JobQueryParameterDTO) {
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
+        const queryFilter = new JobQueryParameter(queryParameters);
+        
+        const result = await this.service.findAll(userDetail, queryFilter);
+        if (queryFilter.hasPaginationMeta()) {
+            return result as Pagination;
+        }
+
+        return (result as Job[]).map<JobDTO>(JobDTO.mutation);
+    }
+
+    @Post()
+    @ApiOperation({ summary: 'Create job' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('create:job')
+    async create(@Req() request, @Body() createJobDto: CreateJobDTO) {
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
+        const job = await this.service.create(userDetail, createJobDto);
+
+        return JobDTO.mutation(job);
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: 'Read single job' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:job')
+    async find(@Req() request, @Param() { id }: IdParameterDTO) {
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
+        const job = await this.service.findOne(userDetail, id);
+
+        return JobDTO.mutation(job);
+    }
+
+    @Patch(':id')
+    @ApiOperation({ summary: 'Update job' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('update:job')
+    async update(@Req() request, @Param() { id }: IdParameterDTO, @Body() updateJobDTO: UpdateJobDTO) {
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
+        const job = await this.service.update(userDetail, id, updateJobDTO);
+
+        return JobDTO.mutation(job);
+    }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Delete job' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('delete:job')
+    async delete(@Req() request, @Param() { id }: IdParameterDTO) {
+        const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
+        const job = await this.service.delete(userDetail, id);
+
+        return JobDTO.mutation(job);
     }
 }
