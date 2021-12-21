@@ -4,10 +4,8 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthzModule } from './authz/authz.module';
 import { ConfigModule } from '@nestjs/config';
-import { SpecialtyModule } from './specialty/specialty.module';
 import { RouterModule } from '@nestjs/core';
 import { GeneralModule } from './general/general.module';
-import { FileModule } from './file/file.module';
 import { UserModule } from './user/user.module';
 import { UniqueConstraint } from './common/validator/unique.validator';
 import { JobModule } from './job/job.module';
@@ -25,9 +23,7 @@ import { JobModule } from './job/job.module';
             }
         ]),
         AuthzModule,
-        SpecialtyModule,
         GeneralModule,
-        FileModule,
         JobModule,
         UserModule
     ],
