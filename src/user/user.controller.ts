@@ -60,7 +60,6 @@ export class UserController {
     async realme(@Req() request) {
         const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
         const user = await this.service.findOne(userDetail);
-        await this.service.update(user);
 
         return user;
     }
