@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional } from "class-validator";
 import { Prop } from "@nestjs/mongoose";
 
-export class JobRunDTO {
+export class RunJobDTO {
     @ApiProperty()
     @Prop()
     @IsString()

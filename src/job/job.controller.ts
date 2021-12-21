@@ -24,7 +24,7 @@ import { JobDTO } from './dto/job.dto';
 import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
 import { JobPreviewDTO } from './dto/job-preview.dto';
-import { JobRunDTO } from './dto/job-run.dto';
+import { RunJobDTO } from './dto/run-job.dto';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -120,9 +120,9 @@ export class JobController {
     @ApiOperation({ summary: 'Run job without creating' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
-    async runSingle(@Req() request, @Body() jobRunDTO: JobRunDTO) {
+    async runSingle(@Req() request, @Body() runJobDTO: RunJobDTO) {
         const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
-        const job = await this.service.runSingle(userDetail, jobRunDTO);
+        const job = await this.service.runSingle(userDetail, runJobDTO);
 
         return job;
     }
