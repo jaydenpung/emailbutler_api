@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserQueryParameter } from './query-parameter/user-query-parameter';
 import axios from 'axios';
 import { AuthenticationClient } from 'auth0';
 import { UserDTO } from './dto/user.dto';
+import { Pagination } from '../../src/common/pagination/pagination';
+import { CreateUserDTO } from './dto/create-user.dto';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -13,7 +16,57 @@ export class UserService {
         @InjectModel(User.name) private readonly model: Model<UserDocument>
     ) { }
 
-    async findAll(queryFilter: UserQueryParameter): Promise<any> {
+    async findAll(queryFilter: UserQueryParameter): Promise<User[] | Pagination> {
+        if (queryFilter.hasPaginationMeta()) {
+            return queryFilter.getPagination(this.model, { deletedAt: null });
+        }
+
+        return queryFilter.setMongooseQuery(this.model, { deletedAt: null });
+    }
+
+    async findOne(id: Types.ObjectId): Promise<User> {
+        const user = await this.model.findOne({ _id: id, deletedAt: null});
+
+        if (!user) {
+            throw new NotFoundException();
+        }
+
+        return user;
+    }
+
+    async create(createUserDto: CreateUserDTO): Promise<User> {
+        return this.model.create({
+            ...createUserDto,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        })
+    }
+
+    async update(id: Types.ObjectId, updateUserDTO: UpdateUserDTO): Promise<User> {
+        const user = await this.model.findOne({ _id: id, deletedAt: null});
+
+        if (!user) {
+            throw new NotFoundException();
+        }
+
+        user.authUserId = updateUserDTO.authUserId || user.authUserId;
+        user.email = updateUserDTO.email || user.email;
+        user.refreshToken = updateUserDTO.refreshToken || user.refreshToken;
+        user.updatedAt = new Date();
+
+        return user.save();
+    }
+    
+    async delete(id: Types.ObjectId): Promise<User> {
+        const user = await this.model.findOne({ _id: id, deletedAt: null});
+
+        if (!user) {
+            throw new NotFoundException();
+        }
+        return user.delete();
+    }
+
+    async findAllFromApi(queryFilter: UserQueryParameter): Promise<any> {
         let userList = null;
         const params = {
             search_engine: "v3"
@@ -77,7 +130,7 @@ export class UserService {
         return userDTO;
     }
 
-    async findOne(userDetail: any): Promise<UserDTO> {
+    async findOneFromApi(userDetail: any): Promise<UserDTO> {
         let userData = null;
         await axios.get(`${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}/${userDetail.user_id}`, {
             headers: { authorization: `Bearer ${await this.getManagementAccessToken()}` }
@@ -92,16 +145,6 @@ export class UserService {
         userDTO.picture = userData.picture;
 
         return userDTO;
-    }
-
-    async update(auth0UserData: any): Promise<any> {
-        const user = await this.model.updateOne(
-            { authUserId: auth0UserData.user_id, deletedAt: null },
-            { email: auth0UserData.email, authUserId: auth0UserData.user_id, refreshToken: auth0UserData.identities[0].refresh_token, updatedAt: new Date() },
-            { upsert: true }
-        );
-
-        return user;
     }
 
     getManagementAccessToken() {
