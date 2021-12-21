@@ -11,7 +11,7 @@ export class GeneralService {
 
     async getLoginUrl(loginRequest: UrlRequestDTO): Promise<UrlResponseDTO> {
         const selectedRedirectUrl = loginRequest.redirectUrl || process.env.AUTH0_REDIRECT;
-        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&access_type=offline&redirect_uri=${selectedRedirectUrl}`;
+        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&connection_scope=https://www.googleapis.com/auth/gmail.readonly,https://www.googleapis.com/auth/drive.file&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&access_type=offline&redirect_uri=${selectedRedirectUrl}`;
         const urlResponseDTO = new UrlResponseDTO();
         urlResponseDTO.url = result;
 
