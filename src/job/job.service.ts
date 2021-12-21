@@ -226,7 +226,7 @@ export class JobService {
         const jobPreview = new JobPreviewDTO();
         jobPreview.emails = [];
 
-        //intialize auth client
+        // intialize auth client
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOG_CLIENT_ID,
             process.env.GOOG_CLIENT_SECRET,
@@ -238,7 +238,7 @@ export class JobService {
             userId: 'me'
         }
 
-        //run job
+        // run job
         const gmail = google.gmail('v1').users.messages;
         const searchResults = await gmail.list({
             ...defaultConfig,
@@ -262,7 +262,7 @@ export class JobService {
 
             emailDTO.snippet = mail.data.snippet;
 
-            //look for subject and date
+            // look for subject and date
             for (const header of mail.data.payload.headers) {
                 if (header.name === 'Subject') {
                     emailDTO.subject = header.value;
@@ -272,7 +272,7 @@ export class JobService {
                 }
             }
 
-            //look for attachments
+            // look for attachments
             for (const part of mail.data.payload.parts) {
                 if (part.filename !== '') {
                     emailDTO.hasAttachment = true;

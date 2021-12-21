@@ -6,4 +6,10 @@ export class JobQueryParameter extends BaseQueryBuilder {
             $text: { $search: value },
         }
     }
+
+    recurring(value: boolean): object {
+        return  {
+            recurring: value
+        }
+    }
 }
