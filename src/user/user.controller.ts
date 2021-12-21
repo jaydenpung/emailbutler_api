@@ -38,9 +38,18 @@ export class UserController {
     async authList(@Query() queryParameters: UserQueryParameterDTO) {
         const queryFilter = new UserQueryParameter(queryParameters);
 
-        const result = await this.service.findAllFromApi(queryFilter);
+        let result = await this.service.findAllFromApi(queryFilter);
+        
         if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
+            const paginationData = result as Pagination;
+
+            queryFilter.getQs().paginationMeta = "false";
+            result = await this.service.findAllFromApi(queryFilter);
+            
+            return {
+                results: result,
+                pagination: paginationData
+            }
         }
 
         return result;
@@ -68,8 +77,6 @@ export class UserController {
         return user;
     }
 
-    
-
     @Get('')
     @ApiOperation({ summary: 'Read many users' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
@@ -77,9 +84,18 @@ export class UserController {
     async index(@Query() queryParameters: UserQueryParameterDTO) {
         const queryFilter = new UserQueryParameter(queryParameters);
 
-        const result = await this.service.findAll(queryFilter);
+        let result = await this.service.findAll(queryFilter);
+
         if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
+            const paginationData = result as Pagination;
+
+            queryFilter.getQs().paginationMeta = "false";
+            result = await this.service.findAll(queryFilter);
+            
+            return {
+                results: (result as User[]).map<UserSchemaDTO>(UserSchemaDTO.mutation),
+                pagination: paginationData
+            }
         }
 
         return (result as User[]).map<UserSchemaDTO>(UserSchemaDTO.mutation);

@@ -25,7 +25,7 @@ import { Pagination } from '../common/pagination/pagination';
 import { IdParameterDTO } from '../common/dto/id-parameter.dto';
 import { JobPreviewDTO } from './dto/job-preview.dto';
 import { RunJobDTO } from './dto/run-job.dto';
-import { TokenUserDTO } from 'src/common/dto/token-user.dto';
+import { TokenUserDTO } from '../../src/common/dto/token-user.dto';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -76,9 +76,18 @@ export class JobController {
         const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
         const queryFilter = new JobQueryParameter(queryParameters);
         
-        const result = await this.service.findAll(userDetail, queryFilter);
+        let result = await this.service.findAll(userDetail, queryFilter);
+        
         if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
+            const paginationData = result as Pagination;
+
+            queryFilter.getQs().paginationMeta = "false";
+            result = await this.service.findAll(userDetail, queryFilter);
+            
+            return {
+                results: (result as Job[]).map<JobDTO>(JobDTO.mutation),
+                pagination: paginationData
+            }
         }
 
         return (result as Job[]).map<JobDTO>(JobDTO.mutation);
