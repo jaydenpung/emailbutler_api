@@ -5,6 +5,7 @@ import { User, UserDocument } from './schemas/user.schema';
 import { UserQueryParameter } from './query-parameter/user-query-parameter';
 import axios from 'axios';
 import { AuthenticationClient } from 'auth0';
+import { UserDTO } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -66,14 +67,31 @@ export class UserService {
         return userList;
     }
 
-    async findOne(userDetail: any): Promise<any> {
+    async findOneFromToken(userDetail: any): Promise<UserDTO> {
+        const userDTO = new UserDTO();
+        userDTO.email = userDetail.email;
+        userDTO.name = userDetail.name;
+        userDTO.nickname = userDetail.nickname;
+        userDTO.picture = userDetail.picture;
+
+        return userDTO;
+    }
+
+    async findOne(userDetail: any): Promise<UserDTO> {
         let userData = null;
         await axios.get(`${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}/${userDetail.user_id}`, {
             headers: { authorization: `Bearer ${await this.getManagementAccessToken()}` }
         }).then(res => {
             userData = res.data;
         })
-        return userData;
+
+        const userDTO = new UserDTO();
+        userDTO.email = userData.email;
+        userDTO.name = userData.name;
+        userDTO.nickname = userData.nickname;
+        userDTO.picture = userData.picture;
+
+        return userDTO;
     }
 
     async update(auth0UserData: any): Promise<any> {
@@ -92,7 +110,7 @@ export class UserService {
             clientId: `${process.env.AUTH0_M2M_CLIENT_ID}`,
             clientSecret: `${process.env.AUTH0_M2M_CLIENT_SECRET}`
         })
-        return new Promise((res, rej) => {
+        return new Promise(res => {
             auth0.clientCredentialsGrant(
                 {
                     audience: `${process.env.AUTH0_ISSUER_URL}api/v2/`

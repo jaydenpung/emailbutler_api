@@ -1,11 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString } from "class-validator";
-import { User } from "../schemas/user.schema";
+import { IsString } from "class-validator";
 
 export class UserDTO {
-    @ApiProperty()
-    @IsString()
-    id: string;
 
     @ApiProperty()
     @IsString()
@@ -13,28 +9,22 @@ export class UserDTO {
 
     @ApiProperty()
     @IsString()
-    authUserId: string;
+    name: string;
 
     @ApiProperty()
     @IsString()
-    refreshToken: string;
+    nickname: string;
 
     @ApiProperty()
-    @IsDate()
-    createdAt: Date;
+    @IsString()
+    picture: string;
 
-    @ApiProperty()
-    @IsDate()
-    updatedAt: Date;
-
-    static mutation(user: User): UserDTO {
+    static mutation(user: UserDTO): UserDTO {
         const dto = new UserDTO();
-        dto.id = user.id,
         dto.email = user.email,
-        dto.refreshToken = user.refreshToken,
-        dto.authUserId = user.authUserId,
-        dto.createdAt = user.createdAt,
-        dto.updatedAt = user.updatedAt
+        dto.name = user.name,
+        dto.nickname = user.nickname,
+        dto.picture = user.picture;
         return dto;
     }
 }

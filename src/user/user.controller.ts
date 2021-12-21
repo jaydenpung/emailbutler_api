@@ -1,11 +1,7 @@
 import {
-    Body,
     Controller,
-    Delete,
     Get,
-    Param,
     Post,
-    Patch,
     Query,
     UseGuards,
     Req
@@ -14,7 +10,6 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Permissions } from '../permissions.decorator';
 import { PermissionsGuard } from '../permissions.guard';
 import { User } from './schemas/user.schema';
 import { UserQueryParameter } from './query-parameter/user-query-parameter';
@@ -49,8 +44,9 @@ export class UserController {
     //@Permissions('read:user')
     async me(@Req() request) {
         const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const user = await this.service.findOneFromToken(userDetail);
 
-        return userDetail;
+        return user;
     }
 
     @Post('realme')
