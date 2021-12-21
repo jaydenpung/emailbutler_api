@@ -8,11 +8,9 @@ import {
     Req,
 } from '@nestjs/common';
 
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiExtraModels, ApiOkResponse, getSchemaPath, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GeneralService } from './general.service';
-import { IdParameterDTO } from '../../src/common/dto/id-parameter.dto';
-import { Pagination } from '../../src/common/pagination/pagination';
-import { LoginRequestDTO } from './dto/loginout-request.dto';
+import { UrlRequestDTO } from './dto/url-request.dto';
 
 @ApiBearerAuth()
 @ApiTags('General')
@@ -24,13 +22,19 @@ export class GeneralController {
 
     @Post('login')
     @ApiOperation({ summary: 'Login' })
-    async getLoginUrl(@Body() loginRequest: LoginRequestDTO) {
-        return await this.service.getLoginUrl(loginRequest);
+    async getLoginUrl(@Body() urlRequest: UrlRequestDTO) {
+        return await this.service.getLoginUrl(urlRequest);
     }
 
     @Post('logout')
     @ApiOperation({ summary: 'Logout' })
-    async getLogoutUrl(@Body() loginRequest: LoginRequestDTO) {
-        return await this.service.getLogoutUrl(loginRequest);
+    async getLogoutUrl(@Body() urlRequest: UrlRequestDTO) {
+        return await this.service.getLogoutUrl(urlRequest);
+    }
+
+    @Post('requestPermission')
+    @ApiOperation({ summary: 'Request additional google permission' })
+    async requestPermission(@Body() urlRequest: UrlRequestDTO) {
+        return await this.service.getGooglePermissionUrl(urlRequest);
     }
 }
