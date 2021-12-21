@@ -29,8 +29,7 @@ export class GeneralService {
 
     async getGooglePermissionUrl(logoutRequest: UrlRequestDTO): Promise<UrlResponseDTO> {
         const selectedRedirectUrl = logoutRequest.redirectUrl || process.env.GOOG_REDIRECT_URI;
-        const result = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOG_CLIENT_ID}&redirect_uri=${selectedRedirectUrl}&response_type=code&
-        state=state_parameter_passthrough_value&scope=https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.file&prompt=consent&include_granted_scopes=true`;
+        const result = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOG_CLIENT_ID}&redirect_uri=${selectedRedirectUrl}&response_type=code&state=state_parameter_passthrough_value&scope=https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.file&prompt=consent&include_granted_scopes=true`;
         const urlResponseDTO = new UrlResponseDTO();
         urlResponseDTO.url = result;
 
