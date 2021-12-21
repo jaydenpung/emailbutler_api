@@ -54,9 +54,9 @@ export class JobController {
     //@Permissions('list:job')
     async listOwnJob(@Req() request, @Query() queryParameters: JobQueryParameterDTO) {
         const queryFilter = new JobQueryParameter(queryParameters);
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         
-        const result = await this.service.findOwnAll(userDetail.user_id, queryFilter);
+        const result = await this.service.findOwnAll(userDetail.userId, queryFilter);
         if (queryFilter.hasPaginationMeta()) {
             return result as Pagination;
         }
@@ -79,8 +79,8 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('create:job')
     async create(@Req() request, @Body() createJobDto: CreateJobDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
-        const job = await this.service.create(userDetail.user_id, createJobDto);
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const job = await this.service.create(userDetail.userId, createJobDto);
 
         return JobDTO.mutation(job);
     }
@@ -110,7 +110,7 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async run(@Req() request, @Param() { id }: IdParameterDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         const job = await this.service.run(userDetail, id);
 
         return JobDTO.mutation(job);
@@ -121,7 +121,7 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async runSingle(@Req() request, @Body() runJobDTO: RunJobDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         const job = await this.service.runSingle(userDetail, runJobDTO);
 
         return job;
@@ -132,7 +132,7 @@ export class JobController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('delete:job')
     async preview(@Req() request, @Param() { id }: IdParameterDTO) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         const jobPreview = await this.service.preview(userDetail, id);
 
         return JobPreviewDTO.mutation(jobPreview);

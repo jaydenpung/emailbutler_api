@@ -132,7 +132,7 @@ export class UserService {
 
     async findOneFromApi(userDetail: any): Promise<UserDTO> {
         let userData = null;
-        await axios.get(`${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}/${userDetail.user_id}`, {
+        await axios.get(`${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}/${userDetail.userId}`, {
             headers: { authorization: `Bearer ${await this.getManagementAccessToken()}` }
         }).then(res => {
             userData = res.data;

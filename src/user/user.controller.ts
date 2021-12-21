@@ -106,7 +106,7 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('read:user')
     async me(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         const user = await this.service.findOneFromToken(userDetail);
 
         return user;
@@ -117,7 +117,7 @@ export class UserController {
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('read:user')
     async realme(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}userDetail`]
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
         const user = await this.service.findOneFromApi(userDetail);
 
         return user;

@@ -87,7 +87,7 @@ export class JobService {
     }
     
     async run(userDetail: any, id: Types.ObjectId): Promise<Job> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.user_id, deletedAt: null});
+        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
 
         if (!job) {
             throw new NotFoundException();
@@ -110,7 +110,7 @@ export class JobService {
     }
 
     async preview(userDetail: any, id: Types.ObjectId): Promise<JobPreviewDTO> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.user_id, deletedAt: null});
+        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
 
         if (!job) {
             throw new NotFoundException();
