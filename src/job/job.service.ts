@@ -15,7 +15,7 @@ import { EmailDTO } from './dto/email.dto';
 import * as stream from 'stream';
 import { JobDTO } from './dto/job.dto';
 import { RunJobDTO } from './dto/run-job.dto';
-import { TokenUserDTO } from 'src/common/dto/token-user.dto';
+import { TokenUserDTO } from '../../src/common/dto/token-user.dto';
 
 @Injectable()
 export class JobService {
