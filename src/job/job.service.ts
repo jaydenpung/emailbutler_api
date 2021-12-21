@@ -12,6 +12,8 @@ import { JobResultDTO } from './dto/job-result.dto';
 import { FileDTO } from './dto/file.dto';
 import { JobPreviewDTO } from './dto/job-preview.dto';
 import { EmailDTO } from './dto/email.dto';
+import * as fs from 'fs';
+import * as stream from 'stream';
 
 @Injectable()
 export class JobService {
@@ -62,6 +64,8 @@ export class JobService {
         }
 
         job.name = updateJobDTO.name || job.name;
+        job.folderId = updateJobDTO.folderId || job.folderId;
+        job.folderName = updateJobDTO.folderName || job.folderName;
         job.storagePath = updateJobDTO.storagePath || job.storagePath;
         job.mailQuery = updateJobDTO.mailQuery || job.mailQuery;
         job.recurring = updateJobDTO.recurring || job.recurring;
@@ -113,15 +117,36 @@ export class JobService {
             return job.save();
         }
 
-        //create gdrive folder for job
-        const folderCreated = await gdrive.files.create({
-            ...defaultConfig,
-            requestBody: {
-                name : job.storagePath,
-                mimeType : 'application/vnd.google-apps.folder'
-            },
-            fields: 'id'
-        })
+        let createFolder = false;
+        if (!job.storagePath || !job.folderId) {
+            createFolder = true;
+        }
+        else {
+            const foundFolder = await gdrive.files.get({
+                ...defaultConfig,
+                fileId: job.folderId,
+                fields: 'id, trashed'
+            })
+
+            if (!foundFolder.data.id || foundFolder.data.trashed) {
+                createFolder = true;
+            }
+        }
+
+        if (createFolder) {            
+            //create gdrive folder for job
+            const folderCreated = await gdrive.files.create({
+                ...defaultConfig,
+                requestBody: {
+                    name : job.folderName,
+                    mimeType : 'application/vnd.google-apps.folder'
+                },
+                fields: 'id'
+            })
+            job.folderId = folderCreated.data.id;
+            job.storagePath = `https://drive.google.com/drive/folders/${folderCreated.data.id}`;
+        }
+        
 
         const jobResults = [];
         const searchedMails = searchResults.data.messages;
@@ -155,17 +180,20 @@ export class JobService {
                         messageId: searchedMail.id
                     })
 
+                    const bufferStream = new stream.PassThrough();
+                    bufferStream.end(Buffer.from(attachment.data.data, 'base64'));
+
                     // save attachment to gdrive
                     const uploadResults = await gdrive.files.create({
                         ...defaultConfig,
                         requestBody: {
                             name: part.filename,
                             mimeType: part.mimeType,
-                            parents: [ folderCreated.data.id ]
+                            parents: [ job.folderId ]
                         },
                         media: {
                             mimeType: part.mimeType,
-                            body: attachment.data.data
+                            body: bufferStream
                         },
                         fields: 'id'
                     })

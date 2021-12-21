@@ -22,6 +22,16 @@ export class Job extends Document {
     @ApiProperty()
     @Prop()
     @IsString()
+    folderName: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    folderId: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
     storagePath: string;
 
     @ApiProperty()

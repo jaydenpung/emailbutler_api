@@ -24,6 +24,16 @@ export class JobDTO {
     @ApiProperty()
     @Prop()
     @IsString()
+    folderName: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    folderId: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
     storagePath: string;
 
     @ApiProperty()
@@ -68,6 +78,8 @@ export class JobDTO {
         dto.id = job.id || null,
         dto.authUserId = job.authUserId || null,
         dto.name = job.name || null,
+        dto.folderName = job.folderName || null,
+        dto.folderId = job.folderId || null,
         dto.storagePath = job.storagePath || null,
         dto.mailQuery = job.mailQuery || null,
         dto.recurring = job.recurring || null,

@@ -15,6 +15,18 @@ export class CreateJobDTO {
     @Prop()
     @IsString()
     @IsOptional()
+    folderName: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    @IsOptional()
+    folderId: string;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    @IsOptional()
     storagePath: string;
 
     @ApiProperty()
