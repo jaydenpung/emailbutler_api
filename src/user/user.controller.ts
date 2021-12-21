@@ -31,6 +31,45 @@ import { UserSchemaDTO } from './dto/user-schema.dto';
 export class UserController {
     constructor(private readonly service: UserService) { }
 
+    @Get('auth/list')
+    @ApiOperation({ summary: 'Read many users via auth0 m2m' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('list:user')
+    async authList(@Query() queryParameters: UserQueryParameterDTO) {
+        const queryFilter = new UserQueryParameter(queryParameters);
+
+        const result = await this.service.findAllFromApi(queryFilter);
+        if (queryFilter.hasPaginationMeta()) {
+            return result as Pagination;
+        }
+
+        return result;
+    }
+
+    @Get('me')
+    @ApiOperation({ summary: 'Get user profile from token' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:user')
+    async me(@Req() request) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const user = await this.service.findOneFromToken(userDetail);
+
+        return user;
+    }
+
+    @Post('realme')
+    @ApiOperation({ summary: 'Get user profile via api call' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:user')
+    async realme(@Req() request) {
+        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
+        const user = await this.service.findOneFromApi(userDetail);
+
+        return user;
+    }
+
+    
+
     @Get('')
     @ApiOperation({ summary: 'Read many users' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
@@ -84,42 +123,5 @@ export class UserController {
         const user = await this.service.delete(id);
 
         return UserSchemaDTO.mutation(user);
-    }
-
-    @Get('auth/list')
-    @ApiOperation({ summary: 'Read many users via auth0 m2m' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('list:user')
-    async authList(@Query() queryParameters: UserQueryParameterDTO) {
-        const queryFilter = new UserQueryParameter(queryParameters);
-
-        const result = await this.service.findAllFromApi(queryFilter);
-        if (queryFilter.hasPaginationMeta()) {
-            return result as Pagination;
-        }
-
-        return result;
-    }
-
-    @Get('me')
-    @ApiOperation({ summary: 'Get user profile from token' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('read:user')
-    async me(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        const user = await this.service.findOneFromToken(userDetail);
-
-        return user;
-    }
-
-    @Post('realme')
-    @ApiOperation({ summary: 'Get user profile via api call' })
-    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-    //@Permissions('read:user')
-    async realme(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        const user = await this.service.findOneFromApi(userDetail);
-
-        return user;
     }
 }
