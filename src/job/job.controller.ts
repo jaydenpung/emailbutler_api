@@ -76,6 +76,7 @@ export class JobController {
         const userDetail = TokenUserDTO.mutation(request.user[`${process.env.AUTH0_AUDIENCE}/user`]);
         const queryFilter = new JobQueryParameter(queryParameters);
         
+        queryFilter.getQs().paginationMeta = "true";
         let result = await this.service.findAll(userDetail, queryFilter);
         
         if (queryFilter.hasPaginationMeta()) {

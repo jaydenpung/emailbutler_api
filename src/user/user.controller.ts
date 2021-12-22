@@ -38,6 +38,7 @@ export class UserController {
     async authList(@Query() queryParameters: UserQueryParameterDTO) {
         const queryFilter = new UserQueryParameter(queryParameters);
 
+        queryFilter.getQs().paginationMeta = "true";
         let result = await this.service.findAllFromApi(queryFilter);
         
         if (queryFilter.hasPaginationMeta()) {
@@ -84,6 +85,7 @@ export class UserController {
     async index(@Query() queryParameters: UserQueryParameterDTO) {
         const queryFilter = new UserQueryParameter(queryParameters);
 
+        queryFilter.getQs().paginationMeta = "true";
         let result = await this.service.findAll(queryFilter);
 
         if (queryFilter.hasPaginationMeta()) {
