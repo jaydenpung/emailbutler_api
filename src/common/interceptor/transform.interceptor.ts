@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { UpdateUserDTO } from 'src/user/dto/update-user.dto';
+import { UpdateUserDTO } from '../../../src/user/dto/update-user.dto';
 import { UserService } from '../../../src/user/user.service';
 import { AuthUserDTO } from '../dto/auth-user.dto';
 

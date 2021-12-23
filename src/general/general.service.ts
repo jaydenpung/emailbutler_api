@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { General, GeneralDocument } from './schemas/general.schema';
-import { User, UserDocument } from 'src/user/schemas/user.schema';
+import { User, UserDocument } from '../../src/user/schemas/user.schema';
 import { UrlRequestDTO } from './dto/url-request.dto';
 import { UrlResponseDTO } from './dto/url-response.dto';
 import { google } from 'googleapis';
 import { GoogleScope } from '../../src/common/enum/google-scope.enum';
 import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
-import { UpdateTokenDTO } from 'src/user/dto/update-token.dto';
-import { CustomGeneralException } from 'src/common/exception/custom-general.exception';
-import { AuthCodeType } from 'src/common/enum/auth-code-type.enum';
+import { UpdateTokenDTO } from '../../src/user/dto/update-token.dto';
+import { CustomGeneralException } from '../../src/common/exception/custom-general.exception';
+import { AuthCodeType } from '../../src/common/enum/auth-code-type.enum';
 import { AuthenticationClient, ManagementClient } from 'auth0';
 
 @Injectable()
