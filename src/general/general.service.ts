@@ -63,8 +63,15 @@ export class GeneralService {
 
         const urlResponseDTO = new UrlResponseDTO();
 
-        //check if there is refresh token in user
+        //check if user exist
         const user = await this.userModel.findOne({ authUserId: authUser.userId });
+        if (!user) {
+            urlResponseDTO.isAuthenticated = false;
+            urlResponseDTO.url = authenticationUrl;
+            return urlResponseDTO;
+        }
+
+        //check if there is refresh token in user
         if (!user.refreshToken) {
             urlResponseDTO.isAuthenticated = false;
             urlResponseDTO.url = authenticationUrl;
@@ -98,6 +105,12 @@ export class GeneralService {
     }
 
     async updateRefreshToken(authUser: AuthUserDTO, updateToken: UpdateTokenDTO): Promise<boolean> {
+        //create user if not exist
+        await this.userModel.updateOne(
+            { authUserId: authUser.userId, deletedAt: null },
+            { email: authUser.email, authUserId: authUser.userId, refreshToken: authUser.refreshToken, updatedAt: new Date() },
+            { upsert: true }
+        );
         const user = await this.userModel.findOne({ authUserId: authUser.userId });
 
         if (updateToken.type == AuthCodeType.GOOGLE) {

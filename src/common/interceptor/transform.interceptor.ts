@@ -44,22 +44,23 @@ export class TransformInterceptor<T>
                 authUser.nickname = userDetail.nickname || null;
                 authUser.name = userDetail.name || null;
                 authUser.picture = userDetail.picture || null;
-                authUser.refreshToken = userDetail.refreshToken || null;
+                //authUser.refreshToken = userDetail.refreshToken || null;
 
                 authUser.roles = requestUser[ROLE_NAMESPACE] || null;
                 authUser.permissions = requestUser.permissions || null;
                 authUser.accessToken = request.headers.authorization?.replace(/^bearer\s+/i, '') || null;
 
+                //no longer passing in refresh token into auth0 access token
                 //check for refresh token
-                if (authUser.refreshToken) {
-                    // save to db
-                    const updateUserDTO = new UpdateUserDTO();
-                    updateUserDTO.authUserId = authUser.userId;
-                    updateUserDTO.email = authUser.email;
-                    updateUserDTO.refreshToken = authUser.refreshToken;
+                // if (authUser.refreshToken) {
+                //     // save to db
+                //     const updateUserDTO = new UpdateUserDTO();
+                //     updateUserDTO.authUserId = authUser.userId;
+                //     updateUserDTO.email = authUser.email;
+                //     updateUserDTO.refreshToken = authUser.refreshToken;
 
-                    await this.userService.upsert(updateUserDTO)
-                }
+                //     await this.userService.upsert(updateUserDTO)
+                // }
 
                 request.user = authUser;
             }
