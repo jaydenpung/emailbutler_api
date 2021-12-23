@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { General, GeneralDocument } from './schemas/general.schema';
 import { User, UserDocument } from '../../src/user/schemas/user.schema';
 import { UrlRequestDTO } from './dto/url-request.dto';
 import { UrlResponseDTO } from './dto/url-response.dto';
@@ -16,7 +15,6 @@ import { AuthenticationClient, ManagementClient } from 'auth0';
 @Injectable()
 export class GeneralService {
     constructor(
-        @InjectModel(General.name) private readonly model: Model<GeneralDocument>,
         @InjectModel(User.name) private readonly userModel: Model<UserDocument>
     ) { }
 
