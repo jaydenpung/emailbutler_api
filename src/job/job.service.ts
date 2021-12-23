@@ -15,24 +15,26 @@ import { EmailDTO } from './dto/email.dto';
 import * as stream from 'stream';
 import { JobDTO } from './dto/job.dto';
 import { RunJobDTO } from './dto/run-job.dto';
-import { TokenUserDTO } from '../../src/common/dto/token-user.dto';
+import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
+import { User, UserDocument } from '../../src/user/schemas/user.schema';
 
 @Injectable()
 export class JobService {
     constructor(
-        @InjectModel(Job.name) private readonly model: Model<JobDocument>
+        @InjectModel(Job.name) private readonly model: Model<JobDocument>,
+        @InjectModel(User.name) private readonly userModel: Model<UserDocument>
     ) { }
 
-    async findAll(userDetail: TokenUserDTO, queryFilter: JobQueryParameter): Promise<Job[] | Pagination> {
+    async findAll(authUser: AuthUserDTO, queryFilter: JobQueryParameter): Promise<Job[] | Pagination> {
         if (queryFilter.hasPaginationMeta()) {
-            return queryFilter.getPagination(this.model, { authUserId: userDetail.userId, deletedAt: null });
+            return queryFilter.getPagination(this.model, { authUserId: authUser.userId, deletedAt: null });
         }
 
-        return queryFilter.setMongooseQuery(this.model, { authUserId: userDetail.userId, deletedAt: null });
+        return queryFilter.setMongooseQuery(this.model, { authUserId: authUser.userId, deletedAt: null });
     }
 
-    async findOne(userDetail: TokenUserDTO, id: Types.ObjectId): Promise<Job> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
+    async findOne(authUser: AuthUserDTO, id: Types.ObjectId): Promise<Job> {
+        const job = await this.model.findOne({ _id: id, authUserId: authUser.userId, deletedAt: null});
 
         if (!job) {
             throw new NotFoundException();
@@ -41,17 +43,17 @@ export class JobService {
         return job;
     }
 
-    async create(userDetail: TokenUserDTO, createJobDto: CreateJobDTO): Promise<Job> {
+    async create(authUser: AuthUserDTO, createJobDto: CreateJobDTO): Promise<Job> {
         return this.model.create({
             ...createJobDto,
-            authUserId: userDetail.userId,
+            authUserId: authUser.userId,
             createdAt: new Date(),
             updatedAt: new Date()
         })
     }
 
-    async update(userDetail: TokenUserDTO, id: Types.ObjectId, updateJobDTO: UpdateJobDTO): Promise<Job> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
+    async update(authUser: AuthUserDTO, id: Types.ObjectId, updateJobDTO: UpdateJobDTO): Promise<Job> {
+        const job = await this.model.findOne({ _id: id, authUserId: authUser.userId, deletedAt: null});
 
         if (!job) {
             throw new NotFoundException();
@@ -69,8 +71,8 @@ export class JobService {
         return job.save();
     }
     
-    async delete(userDetail: TokenUserDTO, id: Types.ObjectId): Promise<Job> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
+    async delete(authUser: AuthUserDTO, id: Types.ObjectId): Promise<Job> {
+        const job = await this.model.findOne({ _id: id, authUserId: authUser.userId, deletedAt: null});
 
         if (!job) {
             throw new NotFoundException();
@@ -79,15 +81,16 @@ export class JobService {
         return job.save();
     }
     
-    async run(userDetail: TokenUserDTO, id: Types.ObjectId): Promise<Job> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
+    async run(authUser: AuthUserDTO, id: Types.ObjectId): Promise<Job> {
+        const job = await this.model.findOne({ _id: id, authUserId: authUser.userId, deletedAt: null});
+        const user = await this.userModel.findOne({ authUserId: authUser.userId });
 
         if (!job) {
             throw new NotFoundException();
         }
         job.lastRunAt = new Date();
 
-        const jobDTO = await this.runJob('refresh token', JobDTO.mutation(job));
+        const jobDTO = await this.runJob(user.refreshToken, JobDTO.mutation(job));
         job.jobResults = jobDTO.jobResults;
         job.folderId = jobDTO.folderId;
         job.storagePath = jobDTO.storagePath;
@@ -95,15 +98,18 @@ export class JobService {
         return job.save();
     }
 
-    async runSingle(userDetail: TokenUserDTO, runJobDTO: RunJobDTO): Promise<JobDTO> {
+    async runSingle(authUser: AuthUserDTO, runJobDTO: RunJobDTO): Promise<JobDTO> {
+        const user = await this.userModel.findOne({ authUserId: authUser.userId });
+
         const jobDTO = new JobDTO();
         jobDTO.folderName = runJobDTO.folderName;
         jobDTO.mailQuery = runJobDTO.mailQuery;
-        return await this.runJob('refresh token', jobDTO);
+        return await this.runJob(user.refreshToken, jobDTO);
     }
 
-    async preview(userDetail: TokenUserDTO, id: Types.ObjectId): Promise<JobPreviewDTO> {
-        const job = await this.model.findOne({ _id: id, authUserId: userDetail.userId, deletedAt: null});
+    async preview(authUser: AuthUserDTO, id: Types.ObjectId): Promise<JobPreviewDTO> {
+        const job = await this.model.findOne({ _id: id, authUserId: authUser.userId, deletedAt: null});
+        const user = await this.userModel.findOne({ authUserId: authUser.userId });
 
         if (!job) {
             throw new NotFoundException();
@@ -118,7 +124,7 @@ export class JobService {
             process.env.GOOG_CLIENT_SECRET,
             process.env.GOOG_REDIRECT_URI
         );
-        oauth2Client.setCredentials({ refresh_token: 'refreshToken' });
+        oauth2Client.setCredentials({ refresh_token: user.refreshToken });
         const defaultConfig = {
             auth: oauth2Client,
             userId: 'me'

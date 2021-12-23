@@ -4,7 +4,6 @@ import {
     Post,
     Query,
     UseGuards,
-    Req,
     Body,
     Delete,
     Param,
@@ -23,6 +22,9 @@ import { IdParameterDTO } from '../../src/common/dto/id-parameter.dto';
 import { CreateUserDTO } from '../../src/user/dto/create-user.dto';
 import { UpdateUserDTO } from '../../src/user/dto/update-user.dto';
 import { UserSchemaDTO } from './dto/user-schema.dto';
+import { UserDTO } from './dto/user.dto';
+import { AuthUser } from '../../src/common/decorator/auth-user.decorator';
+import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
 
 @ApiExtraModels(User)
 @ApiBearerAuth()
@@ -55,13 +57,22 @@ export class UserController {
         return result;
     }
 
+    @Post('auth/me')
+    @ApiOperation({ summary: 'Get user profile via api call with full detail' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:user')
+    async realmefull(@AuthUser() authUser: AuthUserDTO) {
+        const user = await this.service.findOneFromApi(authUser);
+
+        return user;
+    }
+
     @Get('me')
     @ApiOperation({ summary: 'Get user profile from token' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('read:user')
-    async me(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        const user = await this.service.findOneFromToken(userDetail);
+    async me(@AuthUser() authUser: AuthUserDTO) {
+        const user = await this.service.findOneFromToken(authUser);
 
         return user;
     }
@@ -70,11 +81,10 @@ export class UserController {
     @ApiOperation({ summary: 'Get user profile via api call' })
     @UseGuards(AuthGuard('jwt'), PermissionsGuard)
     //@Permissions('read:user')
-    async realme(@Req() request) {
-        const userDetail = request.user[`${process.env.AUTH0_AUDIENCE}/user`]
-        const user = await this.service.findOneFromApi(userDetail);
+    async realme(@AuthUser() authUser: AuthUserDTO) {
+        const user = await this.service.findOneFromApi(authUser);
 
-        return user;
+        return UserDTO.mutation(user);
     }
 
     @Get('')

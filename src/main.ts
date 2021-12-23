@@ -6,6 +6,7 @@ import { config as awsConfig } from 'aws-sdk';
 import { TransformInterceptor } from './common/interceptor/transform.interceptor';
 import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { useContainer } from 'class-validator';
+import { UserService } from './user/user.service';
 
 function initSwagger(app: INestApplication): void {
     const documentBuilder = new DocumentBuilder()
@@ -43,7 +44,9 @@ async function bootstrap(): Promise<void> {
 
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-    app.useGlobalInterceptors(new TransformInterceptor());
+    const userService = await app.get<UserService>(UserService);
+    app.useGlobalInterceptors(new TransformInterceptor(userService));
+
     app.useGlobalFilters(new HttpExceptionFilter());
 
     /* AWS */

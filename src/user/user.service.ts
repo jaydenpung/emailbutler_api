@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserQueryParameter } from './query-parameter/user-query-parameter';
-import axios from 'axios';
-import { AuthenticationClient } from 'auth0';
+import { ManagementClient } from 'auth0';
 import { UserDTO } from './dto/user.dto';
 import { Pagination } from '../../src/common/pagination/pagination';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
 
 @Injectable()
 export class UserService {
@@ -66,6 +66,14 @@ export class UserService {
         return user.delete();
     }
 
+    async upsert(updateUserDTO: UpdateUserDTO): Promise<any> {
+        return await this.model.updateOne(
+            { authUserId: updateUserDTO.authUserId, deletedAt: null },
+            { email: updateUserDTO.email, authUserId: updateUserDTO.authUserId, refreshToken: updateUserDTO.refreshToken, updatedAt: new Date() },
+            { upsert: true }
+        );
+    }
+
     async findAllFromApi(queryFilter: UserQueryParameter): Promise<any> {
         let userList = null;
         const params = {
@@ -100,17 +108,14 @@ export class UserService {
             params['q'] = authUserSearchQuery.replace(/,$/, '');
         }
 
-        await axios.request({
-            method: 'GET',
-            url: `${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}`,
-            params: params,
-            headers: { authorization: `Bearer ${await this.getManagementAccessToken()}` }
-        }).then(res => {
-            userList = res.data;
-        }).catch(err => {
-            const error = new Error(err.message);
-            error['type'] = 'API call to auth0 Fail';
-            throw error;
+        const auth0 = await this.getManagementClient()
+        userList = await auth0.getUsers({
+            q: params['q'],
+            sort: params['sort'],
+            per_page: params['per_page'],
+            page: params['page'],
+            include_totals: params['include_totals'],
+            search_engine: params['search_engine']
         })
 
         if (queryFilter.hasPaginationMeta()) {
@@ -120,48 +125,20 @@ export class UserService {
         return userList;
     }
 
-    async findOneFromToken(userDetail: any): Promise<UserDTO> {
-        const userDTO = new UserDTO();
-        userDTO.email = userDetail.email;
-        userDTO.name = userDetail.name;
-        userDTO.nickname = userDetail.nickname;
-        userDTO.picture = userDetail.picture;
-
-        return userDTO;
+    async findOneFromToken(authUser: AuthUserDTO): Promise<UserDTO> {
+        return UserDTO.mutation(authUser);
     }
 
-    async findOneFromApi(userDetail: any): Promise<UserDTO> {
-        let userData = null;
-        await axios.get(`${process.env.AUTH0_ISSUER_URL}${process.env.AUTH_USER_ENDPOINT}/${userDetail.userId}`, {
-            headers: { authorization: `Bearer ${await this.getManagementAccessToken()}` }
-        }).then(res => {
-            userData = res.data;
-        })
-
-        const userDTO = new UserDTO();
-        userDTO.email = userData.email;
-        userDTO.name = userData.name;
-        userDTO.nickname = userData.nickname;
-        userDTO.picture = userData.picture;
-
-        return userDTO;
+    async findOneFromApi(authUser: AuthUserDTO): Promise<any> {
+        const auth0 = await this.getManagementClient();        
+        return auth0.getUser({ id: authUser.userId });
     }
 
-    getManagementAccessToken() {
-        const auth0 = new AuthenticationClient({
+    async getManagementClient(): Promise<ManagementClient> {
+        return new ManagementClient({
             domain: `${process.env.AUTH0_ACCOUNT}.auth0.com`,
             clientId: `${process.env.AUTH0_M2M_CLIENT_ID}`,
             clientSecret: `${process.env.AUTH0_M2M_CLIENT_SECRET}`
-        })
-        return new Promise(res => {
-            auth0.clientCredentialsGrant(
-                {
-                    audience: `${process.env.AUTH0_ISSUER_URL}api/v2/`
-                },
-                function (err, response) {
-                    res(response.access_token);
-                }
-            );
         });
     }
 }

@@ -11,6 +11,7 @@ import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import * as express from "express";
 import { useContainer } from 'class-validator';
+import { UserService } from './user/user.service';
 
 // NOTE: If you get ERR_CONTENT_DECODING_FAILED in your browser, this is likely
 // due to a compressed response (e.g. gzip) which has not been handled correctly
@@ -41,7 +42,9 @@ async function bootstrapServer(): Promise<Server> {
     
     useContainer(nestApp.select(AppModule), { fallbackOnErrors: true });
 
-    nestApp.useGlobalInterceptors(new TransformInterceptor());
+    const userService = await nestApp.get<UserService>(UserService);
+    nestApp.useGlobalInterceptors(new TransformInterceptor(userService));
+
     nestApp.useGlobalFilters(new HttpExceptionFilter());
 
     await nestApp.init();
