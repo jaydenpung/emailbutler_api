@@ -62,7 +62,7 @@ export class JobService {
         job.folderName = updateJobDTO.folderName || job.folderName;
         job.storagePath = updateJobDTO.storagePath || job.storagePath;
         job.mailQuery = updateJobDTO.mailQuery || job.mailQuery;
-        job.recurring = updateJobDTO.recurring === null? job.recurring : updateJobDTO.recurring;
+        job.recurring = updateJobDTO.recurring || job.recurring;
         job.jobResults = updateJobDTO.jobResults || job.jobResults;
 
         job.updatedAt = new Date();
