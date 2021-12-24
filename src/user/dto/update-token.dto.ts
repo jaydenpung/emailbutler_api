@@ -13,4 +13,9 @@ export class UpdateTokenDTO {
     @Prop()
     @IsEnum(AuthCodeType)
     type: AuthCodeType;
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    redirectUrl: string;
 }

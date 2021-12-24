@@ -116,7 +116,7 @@ export class GeneralService {
             const oauth2Client = new google.auth.OAuth2(
                 process.env.GOOG_CLIENT_ID,
                 process.env.GOOG_CLIENT_SECRET,
-                process.env.GOOG_REDIRECT_URI
+                updateToken.redirectUrl || process.env.GOOG_REDIRECT_URI
             );
 
             // get refresh token
@@ -143,7 +143,7 @@ export class GeneralService {
                 if (ex.name === CustomGeneralException.name) {
                     throw ex;
                 }
-                throw new CustomGeneralException("Invalid authCode");
+                throw new CustomGeneralException("Invalid authCode" + ex);
             }
         }
         else if (updateToken.type == AuthCodeType.AUTH0) {
