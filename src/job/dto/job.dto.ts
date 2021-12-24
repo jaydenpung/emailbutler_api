@@ -82,7 +82,7 @@ export class JobDTO {
         dto.folderId = job.folderId || null,
         dto.storagePath = job.storagePath || null,
         dto.mailQuery = job.mailQuery || null,
-        dto.recurring = job.recurring || null,
+        dto.recurring = job.recurring === null? null : job.recurring,
         dto.jobResults = JobResultDTO.mutation(job.jobResults) || [];
         dto.lastRunAt = job.lastRunAt || null;
         dto.createdAt = job.createdAt || null;
