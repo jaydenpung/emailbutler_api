@@ -13,6 +13,11 @@ export class UrlRequestDTO {
     redirectUrl: string;
 
     @ApiProperty()
+    @IsString()
+    @IsOptional()
+    state: string;
+
+    @ApiProperty()
     @IsBoolean()
     @IsOptional()
     requestRefreshToken: boolean;

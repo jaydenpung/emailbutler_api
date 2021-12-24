@@ -51,7 +51,7 @@ export class GeneralService {
             client_id: process.env.GOOG_CLIENT_ID,
             redirect_uri: urlRequest.redirectUrl || process.env.GOOG_REDIRECT_URI,
             response_type: 'code',
-            state: 'temporary_state_token',
+            state: urlRequest.state,
             scope: [GoogleScope.GDRIVE, GoogleScope.GMAIL],
             prompt: 'consent',
             access_type: 'offline',
