@@ -17,8 +17,8 @@ import { JobDTO } from './dto/job.dto';
 import { RunJobDTO } from './dto/run-job.dto';
 import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
 import { User, UserDocument } from '../../src/user/schemas/user.schema';
-import { JobStatus } from 'src/common/enum/job-status.enum';
-import { CustomGeneralException } from 'src/common/exception/custom-general.exception';
+import { JobStatus } from '../../src/common/enum/job-status.enum';
+import { CustomGeneralException } from '../../src/common/exception/custom-general.exception';
 
 @Injectable()
 export class JobService {
