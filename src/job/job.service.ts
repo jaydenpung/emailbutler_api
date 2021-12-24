@@ -17,6 +17,8 @@ import { JobDTO } from './dto/job.dto';
 import { RunJobDTO } from './dto/run-job.dto';
 import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
 import { User, UserDocument } from '../../src/user/schemas/user.schema';
+import { JobStatus } from 'src/common/enum/job-status.enum';
+import { CustomGeneralException } from 'src/common/exception/custom-general.exception';
 
 @Injectable()
 export class JobService {
@@ -58,6 +60,10 @@ export class JobService {
         if (!job) {
             throw new NotFoundException();
         }
+        
+        if (job.status === JobStatus.RUNNING) {
+            throw new CustomGeneralException(`Cannot delete job with status: ${job.status}`);
+        }
 
         job.name = updateJobDTO.name || job.name;
         job.folderId = updateJobDTO.folderId || job.folderId;
@@ -77,6 +83,11 @@ export class JobService {
         if (!job) {
             throw new NotFoundException();
         }
+
+        if (job.status === JobStatus.RUNNING) {
+            throw new CustomGeneralException(`Cannot delete job with status: ${job.status}`);
+        }
+        
         job.deletedAt = new Date();
         return job.save();
     }
@@ -232,8 +243,7 @@ export class JobService {
             })
             job.folderId = folderCreated.data.id;
             job.storagePath = `https://drive.google.com/drive/folders/${folderCreated.data.id}`;
-        }
-        
+        }       
 
         const jobResults = [];
         const searchedMails = searchResults.data.messages;

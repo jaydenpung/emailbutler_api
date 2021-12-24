@@ -26,6 +26,8 @@ import { JobPreviewDTO } from './dto/job-preview.dto';
 import { RunJobDTO } from './dto/run-job.dto';
 import { AuthUser } from '../../src/common/decorator/auth-user.decorator';
 import { AuthUserDTO } from '../../src/common/dto/auth-user.dto';
+import { JobStatusDTO } from './dto/job-status.dto';
+import { JobStatus } from '../../src/common/enum/job-status.enum';
 
 @ApiExtraModels(Job)
 @ApiBearerAuth()
@@ -62,6 +64,33 @@ export class JobController {
         const jobPreview = await this.service.preview(authUser, id);
 
         return JobPreviewDTO.mutation(jobPreview);
+    }
+
+    @Get('check/:id')
+    @ApiOperation({ summary: 'Check job status' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:job')
+    async check(@AuthUser() authUser: AuthUserDTO, @Param() { id }: IdParameterDTO) {
+        const job = await this.service.findOne(authUser, id);
+
+        return JobStatusDTO.mutation(job);
+    }
+
+    @Get('checkLongPolling/:id')
+    @ApiOperation({ summary: 'Check job status via long polling' })
+    @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+    //@Permissions('read:job')
+    async checkLongPolling(@AuthUser() authUser: AuthUserDTO, @Param() { id }: IdParameterDTO) {
+        let job;
+        while (true) {
+            job = await this.service.findOne(authUser, id);
+
+            if (job.status === JobStatus.NORMAL) {
+                break;
+            }
+        }
+
+        return JobStatusDTO.mutation(job);
     }
 
     /*** CRUD ***/
