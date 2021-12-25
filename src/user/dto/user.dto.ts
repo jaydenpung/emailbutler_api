@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
+import { AuthUserDTO } from "../../../src/common/dto/auth-user.dto";
 
 export class UserDTO {
 
@@ -19,7 +20,7 @@ export class UserDTO {
     @IsString()
     picture: string;
 
-    static mutation(user: UserDTO): UserDTO {
+    static mutation(user: (UserDTO | AuthUserDTO)): UserDTO {
         const dto = new UserDTO();
         dto.email = user.email,
         dto.name = user.name,

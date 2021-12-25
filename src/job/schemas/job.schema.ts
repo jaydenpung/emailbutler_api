@@ -40,13 +40,18 @@ export class Job extends Document {
     mailQuery: string;
 
     @ApiProperty()
-    @Prop({ default: false })
+    @Prop({ default: true })
     @IsBoolean()
     recurring: boolean;
 
     @ApiProperty()
     @Prop({ type: JobResultDTO })
     jobResults: JobResultDTO[];
+
+    @ApiProperty()
+    @Prop()
+    @IsString()
+    status: string;
 
     @ApiProperty()
     @Prop()

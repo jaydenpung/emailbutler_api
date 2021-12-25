@@ -4,6 +4,7 @@ import { Job } from "../schemas/job.schema";
 import { Prop } from "@nestjs/mongoose";
 import { JobResultDTO } from "./job-result.dto";
 import { Type } from "class-transformer";
+import { JobStatus } from "../../../src/common/enum/job-status.enum";
 
 export class JobDTO {
 
@@ -55,6 +56,11 @@ export class JobDTO {
 
     @ApiProperty()
     @Prop()
+    @IsString()
+    status: string;
+
+    @ApiProperty()
+    @Prop()
     @IsDate()
     lastRunAt: Date;
 
@@ -82,8 +88,9 @@ export class JobDTO {
         dto.folderId = job.folderId || null,
         dto.storagePath = job.storagePath || null,
         dto.mailQuery = job.mailQuery || null,
-        dto.recurring = job.recurring || null,
+        dto.recurring = job.recurring === null? null : job.recurring,
         dto.jobResults = JobResultDTO.mutation(job.jobResults) || [];
+        dto.status = job.status || JobStatus.NORMAL,
         dto.lastRunAt = job.lastRunAt || null;
         dto.createdAt = job.createdAt || null;
         dto.updatedAt = job.updatedAt || null;

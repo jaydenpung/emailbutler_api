@@ -1,7 +1,7 @@
 import { Prop } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsDate, IsOptional, IsArray, ValidateNested, IsString } from "class-validator";
+import { IsDate, IsOptional, IsArray, ValidateNested, IsString, IsInt } from "class-validator";
 import { FileDTO as FileDTO } from "./file.dto";
 
 export class JobResultDTO {
@@ -22,6 +22,11 @@ export class JobResultDTO {
     @Type(() => FileDTO )
     @ValidateNested({ each: true })
     files: FileDTO[];
+
+    @ApiProperty()
+    @IsInt()
+    @IsOptional()
+    runTime: number;
 
     @ApiProperty()
     @IsDate()
@@ -47,6 +52,7 @@ export class JobResultDTO {
         dto.emailTitle = jobResultDTO.emailTitle || null;
         dto.emailDate = jobResultDTO.emailDate || null;
         dto.files = FileDTO.mutation(jobResultDTO.files) || [];
+        dto.runTime = jobResultDTO.runTime || null;
         dto.createdAt = jobResultDTO.createdAt || new Date();
 
         return dto;

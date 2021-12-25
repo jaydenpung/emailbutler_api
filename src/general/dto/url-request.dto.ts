@@ -1,9 +1,24 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsOptional, IsString } from "class-validator";
 
 export class UrlRequestDTO {
     @ApiProperty()
     @IsString()
     @IsOptional()
+    authCode: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
     redirectUrl: string;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    state: string;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    requestRefreshToken: boolean;
 }
