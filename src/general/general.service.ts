@@ -24,7 +24,7 @@ export class GeneralService {
           For now, login should not be asking for gmail/gdrive scopes, hence no need to request for refresh token.
         */
         //const result = `${process.env.AUTH0_ISSUER_URL}authorize?${urlRequest.requestRefreshToken? 'scope=offline_access&' : ''}response_type=code&connection_scope=${GoogleScope.GMAIL},${GoogleScope.GDRIVE}&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&access_type=offline&redirect_uri=${selectedRedirectUrl}${urlRequest.requestRefreshToken? '&prompt=consent' : ''}`;
-        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&access_type=offline&redirect_uri=${selectedRedirectUrl}${urlRequest.requestRefreshToken? '&prompt=consent' : ''}`;
+        const result = `${process.env.AUTH0_ISSUER_URL}authorize?response_type=token&audience=${process.env.AUTH0_AUDIENCE}&client_id=${process.env.AUTH0_CLIENT_ID}&access_type=offline&state=${urlRequest.state}&redirect_uri=${selectedRedirectUrl}${urlRequest.requestRefreshToken? '&prompt=consent' : ''}`;
         const urlResponseDTO = new UrlResponseDTO();
         urlResponseDTO.url = result;
 
